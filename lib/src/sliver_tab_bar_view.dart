@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// [SliverTabBarView] is a sliver that renders a list of slivers (one per tab)
 /// inside a [TabBarView], so each tab can have its own scrollable sliver

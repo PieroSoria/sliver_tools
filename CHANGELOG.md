@@ -1,3 +1,10 @@
+# 0.3.0
+
+* Breaking: [SliverTabBarView] now depends on `package:material_ui`.
+  Its `controller` parameter is now `material_ui`'s `TabController`, so
+  `SliverTabBarView` must be used with apps migrated to `package:material_ui`.
+* Added `material_ui` as a dependency.
+
 # 0.2.13
 
 * Added [SliverTabBarView], a sliver that renders a list of slivers (one per tab) inside a [TabBarView], wrapping each page in its own [CustomScrollView].
