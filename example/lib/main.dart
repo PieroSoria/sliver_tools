@@ -21,44 +21,62 @@ class SliverToolsExampleApp extends StatelessWidget {
   }
 }
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
   @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
+  late TabController _tabController;
+
+  @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(length: 3, vsync: this);
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return DefaultTabController(
-      length: 3,
-      child: Scaffold(
-        appBar: AppBar(
-          title: const Text('SliverTabBarView'),
-          bottom: const TabBar(
-            tabs: [
-              Tab(text: 'Feed'),
-              Tab(text: 'Grid'),
-              Tab(text: 'Nested'),
-            ],
-          ),
-        ),
-        body: CustomScrollView(
-          slivers: const [
-            SliverToBoxAdapter(
-              child: Padding(
-                padding: EdgeInsets.all(16),
-                child: Text(
-                  'SliverTabBarView lives inside this CustomScrollView.',
-                  style: TextStyle(fontSize: 14, fontStyle: FontStyle.italic),
-                ),
-              ),
-            ),
-            SliverTabBarView(
-              slivers: [
-                FeedPage(),
-                GridPage(),
-                NestedPage(),
-              ],
-            ),
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('SliverTabBarView'),
+        bottom: TabBar(
+          controller: _tabController,
+          tabs: const [
+            Tab(text: 'Feed'),
+            Tab(text: 'Grid'),
+            Tab(text: 'Nested'),
           ],
         ),
+      ),
+      body: CustomScrollView(
+        slivers: [
+          const SliverToBoxAdapter(
+            child: Padding(
+              padding: EdgeInsets.all(16),
+              child: Text(
+                'SliverTabBarView lives inside this CustomScrollView.',
+                style: TextStyle(fontSize: 14, fontStyle: FontStyle.italic),
+              ),
+            ),
+          ),
+          SliverTabBarView(
+            controller: _tabController,
+            slivers: const [
+              FeedPage(),
+              GridPage(),
+              NestedPage(),
+            ],
+          ),
+        ],
       ),
     );
   }
