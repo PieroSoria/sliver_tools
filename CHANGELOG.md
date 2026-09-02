@@ -3,9 +3,12 @@
 * Breaking: [SliverTabBarView] now depends on `package:material_ui`.
   Its `controller` parameter is now `material_ui`'s `TabController`, so
   `SliverTabBarView` must be used with apps migrated to `package:material_ui`.
-* Breaking: [SliverTabBarView] now takes `children` (one scrollable page per
-  tab) instead of `slivers`. Pages are passed straight into the `TabBarView`;
-  pass your own `CustomScrollView`, `ListView` or `GridView` pages.
+* Breaking: [SliverTabBarView] no longer uses a [TabBarView] or a `height`.
+  Each entry in `children` is now a sliver (use a [MultiSliver] to group
+  several slivers into one tab). Only the active tab's slivers are inserted
+  into the parent [CustomScrollView], so tab content shares the parent's
+  scroll instead of scrolling in its own nested viewport. Tabs are switched
+  from the [TabBar] (no horizontal swipe).
 * Added `material_ui` as a dependency.
 
 # 0.2.13

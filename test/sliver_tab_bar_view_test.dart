@@ -18,21 +18,23 @@ void main() {
           ),
           body: CustomScrollView(
             slivers: [
+              const SliverToBoxAdapter(child: Text('Leading content')),
               SliverTabBarView(
                 controller: controller,
-                children: const [
-                  CustomScrollView(
-                    slivers: [
+                children: [
+                  MultiSliver(
+                    children: const [
                       SliverToBoxAdapter(child: Text('Page 1')),
                     ],
                   ),
-                  CustomScrollView(
-                    slivers: [
+                  MultiSliver(
+                    children: const [
                       SliverToBoxAdapter(child: Text('Page 2')),
                     ],
                   ),
                 ],
               ),
+              const SliverToBoxAdapter(child: Text('Trailing content')),
             ],
           ),
         ),
@@ -40,21 +42,20 @@ void main() {
     );
   }
 
-  testWidgets('renders the first page inside a CustomScrollView', (
-    tester,
-  ) async {
+  testWidgets('renders the slivers of the first tab', (tester) async {
     await tester.pumpWidget(buildWidget());
 
     expect(find.text('Page 1'), findsOneWidget);
     expect(find.text('Page 2'), findsNothing);
   });
 
-  testWidgets('switches between pages when a tab is tapped', (tester) async {
+  testWidgets('switches between tabs when a tab is tapped', (tester) async {
     await tester.pumpWidget(buildWidget());
 
     await tester.tap(find.text('Two'));
     await tester.pumpAndSettle();
 
+    expect(find.text('Page 1'), findsNothing);
     expect(find.text('Page 2'), findsOneWidget);
   });
 
@@ -70,37 +71,12 @@ void main() {
     expect(find.text('Page 2'), findsOneWidget);
   });
 
-  testWidgets('uses a fixed height when height is provided', (tester) async {
-    await tester.pumpWidget(
-      const DefaultTabController(
-        length: 2,
-        child: MaterialApp(
-          home: Scaffold(
-            body: CustomScrollView(
-              slivers: [
-                SliverTabBarView(
-                  height: 200,
-                  children: [
-                    CustomScrollView(
-                      slivers: [
-                        SliverToBoxAdapter(child: Text('Page 1')),
-                      ],
-                    ),
-                    CustomScrollView(
-                      slivers: [
-                        SliverToBoxAdapter(child: Text('Page 2')),
-                      ],
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
+  testWidgets('tab content shares the parent scroll', (tester) async {
+    await tester.pumpWidget(buildWidget());
 
-    final size = tester.getSize(find.byType(TabBarView));
-    expect(size.height, 200);
+    await tester.drag(find.byType(CustomScrollView), const Offset(0, -300));
+    await tester.pumpAndSettle();
+
+    expect(find.byType(CustomScrollView), findsOneWidget);
   });
 }
