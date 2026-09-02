@@ -49,12 +49,12 @@ import 'package:flutter/material.dart';
 /// ```
 class SliverTabBarView extends StatelessWidget {
   const SliverTabBarView({
-    Key? key,
+    super.key,
     required this.slivers,
     this.controller,
     this.physics,
     this.height,
-  }) : super(key: key);
+  });
 
   /// One sliver (or multi-sliver group such as [MultiSliver]) per tab. Each
   /// entry is wrapped in its own [CustomScrollView].

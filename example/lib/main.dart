@@ -6,7 +6,7 @@ void main() => runApp(const SliverToolsExampleApp());
 /// Example app demonstrating [SliverTabBarView], which renders one sliver
 /// (e.g. a [MultiSliver]) per tab inside a [TabBarView].
 class SliverToolsExampleApp extends StatelessWidget {
-  const SliverToolsExampleApp({Key? key}) : super(key: key);
+  const SliverToolsExampleApp({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -22,7 +22,7 @@ class SliverToolsExampleApp extends StatelessWidget {
 }
 
 class HomePage extends StatelessWidget {
-  const HomePage({Key? key}) : super(key: key);
+  const HomePage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -66,7 +66,7 @@ class HomePage extends StatelessWidget {
 
 /// A simple multi-sliver page: a pinned header followed by a lazy list.
 class FeedPage extends StatelessWidget {
-  const FeedPage({Key? key}) : super(key: key);
+  const FeedPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -94,7 +94,7 @@ class FeedPage extends StatelessWidget {
 
 /// A multi-sliver page that combines a header with a grid.
 class GridPage extends StatelessWidget {
-  const GridPage({Key? key}) : super(key: key);
+  const GridPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -130,7 +130,7 @@ class GridPage extends StatelessWidget {
 
 /// A multi-sliver page that stacks several sliver sections together.
 class NestedPage extends StatelessWidget {
-  const NestedPage({Key? key}) : super(key: key);
+  const NestedPage({super.key});
 
   @override
   Widget build(BuildContext context) {

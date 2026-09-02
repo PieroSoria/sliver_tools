@@ -1,6 +1,7 @@
 # 0.2.13
 
 * Added [SliverTabBarView], a sliver that renders a list of slivers (one per tab) inside a [TabBarView], wrapping each page in its own [CustomScrollView].
+* Updated the minimum SDK constraint to Dart `>=3.0.0` / Flutter `>=3.10.0`.
 
 # 0.2.12
 
