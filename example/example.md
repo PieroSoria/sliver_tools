@@ -12,8 +12,9 @@ flutter run
 ## SliverTabBarView example
 
 The runnable app in `lib/main.dart` demonstrates `SliverTabBarView`, which
-renders one sliver (e.g. a `MultiSliver`) per tab inside a `TabBarView`. It is
-used **inside a `CustomScrollView`**, after a small leading sliver:
+renders one scrollable page (a `CustomScrollView`) per tab inside a
+`TabBarView`. It is used **inside a `CustomScrollView`**, after a small
+leading sliver:
 
 * **Feed** – a `MultiSliver` with a pinned header and a lazy `SliverList`.
 * **Grid** – a `MultiSliver` with a header and a `SliverGrid`.

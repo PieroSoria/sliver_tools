@@ -1,14 +1,13 @@
 import 'package:material_ui/material_ui.dart';
 
-/// [SliverTabBarView] is a sliver that renders a list of slivers (one per tab)
-/// inside a [TabBarView], so each tab can have its own scrollable sliver
-/// content such as a [MultiSliver]. Use it directly inside a
-/// [CustomScrollView]'s `slivers` list.
+/// [SliverTabBarView] is a sliver that renders a list of pages (one per tab)
+/// inside a [TabBarView]. Use it directly inside a [CustomScrollView]'s
+/// `slivers` list.
 ///
-/// A sliver cannot live inside a [TabBarView] directly because its pages need a
-/// bounded height in order to scroll. [SliverTabBarView] solves this by
-/// wrapping each entry of [slivers] in its own [CustomScrollView], placing
-/// those into the [TabBarView], and then turning the whole thing into a sliver:
+/// Each page in [children] is expected to be scrollable on its own (for
+/// example a [CustomScrollView], a [ListView] or a [GridView]);
+/// [SliverTabBarView] adds the horizontal swipe between them and turns the
+/// whole thing into a sliver with a bounded height:
 ///
 /// * When [height] is provided the [TabBarView] is given that fixed height and
 ///   wrapped in a [SliverToBoxAdapter].
@@ -28,16 +27,14 @@ import 'package:material_ui/material_ui.dart';
 ///       slivers: [
 ///         SliverToBoxAdapter(child: Text('Leading content')),
 ///         const SliverTabBarView(
-///           slivers: [
-///             MultiSliver(
-///               children: [
+///           children: [
+///             CustomScrollView(
+///               slivers: [
 ///                 SliverToBoxAdapter(child: Text('Page A')),
 ///               ],
 ///             ),
-///             MultiSliver(
-///               children: [
-///                 SliverToBoxAdapter(child: Text('Page B')),
-///               ],
+///             ListView(
+///               children: [Text('Page B')],
 ///             ),
 ///           ],
 ///         ),
@@ -50,23 +47,17 @@ import 'package:material_ui/material_ui.dart';
 class SliverTabBarView extends StatelessWidget {
   const SliverTabBarView({
     super.key,
-    required this.slivers,
+    required this.children,
     this.controller,
-    this.physics,
     this.height,
   });
 
-  /// One sliver (or multi-sliver group such as [MultiSliver]) per tab. Each
-  /// entry is wrapped in its own [CustomScrollView].
-  final List<Widget> slivers;
+  /// One scrollable page per tab.
+  final List<Widget> children;
 
   /// The [TabController] that drives the [TabBarView]. When null a
   /// [DefaultTabController] ancestor is used.
   final TabController? controller;
-
-  /// The scroll physics applied to each of the [CustomScrollView]s that wrap
-  /// the entries of [slivers].
-  final ScrollPhysics? physics;
 
   /// The height given to the [TabBarView]. When null the [TabBarView] fills
   /// the remaining viewport extent.
@@ -74,17 +65,9 @@ class SliverTabBarView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final pages = [
-      for (final sliver in slivers)
-        CustomScrollView(
-          physics: physics,
-          slivers: [sliver],
-        ),
-    ];
-
     final tabBarView = controller == null
-        ? TabBarView(children: pages)
-        : TabBarView(controller: controller, children: pages);
+        ? TabBarView(children: children)
+        : TabBarView(controller: controller, children: children);
 
     final height = this.height;
     if (height != null) {

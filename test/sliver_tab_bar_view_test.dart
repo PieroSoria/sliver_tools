@@ -1,5 +1,5 @@
-import 'package:material_ui/material_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:sliver_tools/sliver_tools.dart';
 
 void main() {
@@ -20,14 +20,14 @@ void main() {
             slivers: [
               SliverTabBarView(
                 controller: controller,
-                slivers: [
-                  MultiSliver(
-                    children: const [
+                children: const [
+                  CustomScrollView(
+                    slivers: [
                       SliverToBoxAdapter(child: Text('Page 1')),
                     ],
                   ),
-                  MultiSliver(
-                    children: const [
+                  CustomScrollView(
+                    slivers: [
                       SliverToBoxAdapter(child: Text('Page 2')),
                     ],
                   ),
@@ -40,7 +40,7 @@ void main() {
     );
   }
 
-  testWidgets('renders the first page sliver inside a CustomScrollView', (
+  testWidgets('renders the first page inside a CustomScrollView', (
     tester,
   ) async {
     await tester.pumpWidget(buildWidget());
@@ -72,7 +72,7 @@ void main() {
 
   testWidgets('uses a fixed height when height is provided', (tester) async {
     await tester.pumpWidget(
-      DefaultTabController(
+      const DefaultTabController(
         length: 2,
         child: MaterialApp(
           home: Scaffold(
@@ -80,14 +80,14 @@ void main() {
               slivers: [
                 SliverTabBarView(
                   height: 200,
-                  slivers: [
-                    MultiSliver(
-                      children: const [
+                  children: [
+                    CustomScrollView(
+                      slivers: [
                         SliverToBoxAdapter(child: Text('Page 1')),
                       ],
                     ),
-                    MultiSliver(
-                      children: const [
+                    CustomScrollView(
+                      slivers: [
                         SliverToBoxAdapter(child: Text('Page 2')),
                       ],
                     ),
@@ -100,8 +100,6 @@ void main() {
       ),
     );
 
-    final tabBarView = tester.widgetList<TabBarView>(find.byType(TabBarView));
-    expect(tabBarView, isNotEmpty);
     final size = tester.getSize(find.byType(TabBarView));
     expect(size.height, 200);
   });

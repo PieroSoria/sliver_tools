@@ -70,7 +70,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
           ),
           SliverTabBarView(
             controller: _tabController,
-            slivers: const [
+            children: const [
               FeedPage(),
               GridPage(),
               NestedPage(),
@@ -82,100 +82,112 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   }
 }
 
-/// A simple multi-sliver page: a pinned header followed by a lazy list.
+/// A scrollable page: a pinned header followed by a lazy list.
 class FeedPage extends StatelessWidget {
   const FeedPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return MultiSliver(
-      pushPinnedChildren: true,
-      children: [
-        const SliverPersistentHeader(
-          pinned: true,
-          delegate: _SectionHeaderDelegate('Feed', Colors.indigo),
-        ),
-        SliverList(
-          delegate: SliverChildBuilderDelegate(
-            (_, i) => ListTile(
-              leading: const Icon(Icons.article),
-              title: Text('Feed item $i'),
-              trailing: const Icon(Icons.chevron_right),
+    return CustomScrollView(
+      slivers: [
+        MultiSliver(
+          pushPinnedChildren: true,
+          children: [
+            const SliverPersistentHeader(
+              pinned: true,
+              delegate: _SectionHeaderDelegate('Feed', Colors.indigo),
             ),
-            childCount: 50,
-          ),
+            SliverList(
+              delegate: SliverChildBuilderDelegate(
+                (_, i) => ListTile(
+                  leading: const Icon(Icons.article),
+                  title: Text('Feed item $i'),
+                  trailing: const Icon(Icons.chevron_right),
+                ),
+                childCount: 50,
+              ),
+            ),
+          ],
         ),
       ],
     );
   }
 }
 
-/// A multi-sliver page that combines a header with a grid.
+/// A scrollable page that combines a header with a grid.
 class GridPage extends StatelessWidget {
   const GridPage({super.key});
 
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    return MultiSliver(
-      children: [
-        const SliverPersistentHeader(
-          pinned: true,
-          delegate: _SectionHeaderDelegate('Grid', Colors.teal),
-        ),
-        SliverPadding(
-          padding: const EdgeInsets.all(8),
-          sliver: SliverGrid.count(
-            crossAxisCount: 3,
-            mainAxisSpacing: 8,
-            crossAxisSpacing: 8,
-            children: [
-              for (var i = 0; i < 18; i++)
-                Container(
-                  decoration: BoxDecoration(
-                    color: colorScheme.primaryContainer,
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Center(child: Text('$i')),
-                ),
-            ],
-          ),
+    return CustomScrollView(
+      slivers: [
+        MultiSliver(
+          children: [
+            const SliverPersistentHeader(
+              pinned: true,
+              delegate: _SectionHeaderDelegate('Grid', Colors.teal),
+            ),
+            SliverPadding(
+              padding: const EdgeInsets.all(8),
+              sliver: SliverGrid.count(
+                crossAxisCount: 3,
+                mainAxisSpacing: 8,
+                crossAxisSpacing: 8,
+                children: [
+                  for (var i = 0; i < 18; i++)
+                    Container(
+                      decoration: BoxDecoration(
+                        color: colorScheme.primaryContainer,
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Center(child: Text('$i')),
+                    ),
+                ],
+              ),
+            ),
+          ],
         ),
       ],
     );
   }
 }
 
-/// A multi-sliver page that stacks several sliver sections together.
+/// A scrollable page that stacks several sliver sections together.
 class NestedPage extends StatelessWidget {
   const NestedPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return MultiSliver(
-      pushPinnedChildren: true,
-      children: [
-        const SliverPersistentHeader(
-          pinned: true,
-          delegate: _SectionHeaderDelegate('Nested', Colors.deepOrange),
-        ),
-        const SliverToBoxAdapter(
-          child: Padding(
-            padding: EdgeInsets.all(16),
-            child: Text(
-              'MultiSliver lets you group several slivers into one page.',
-              style: TextStyle(fontSize: 16),
+    return CustomScrollView(
+      slivers: [
+        MultiSliver(
+          pushPinnedChildren: true,
+          children: [
+            const SliverPersistentHeader(
+              pinned: true,
+              delegate: _SectionHeaderDelegate('Nested', Colors.deepOrange),
             ),
-          ),
-        ),
-        SliverList(
-          delegate: SliverChildBuilderDelegate(
-            (_, i) => ListTile(
-              leading: const Icon(Icons.collections_bookmark),
-              title: Text('Nested item $i'),
+            const SliverToBoxAdapter(
+              child: Padding(
+                padding: EdgeInsets.all(16),
+                child: Text(
+                  'MultiSliver lets you group several slivers into one page.',
+                  style: TextStyle(fontSize: 16),
+                ),
+              ),
             ),
-            childCount: 30,
-          ),
+            SliverList(
+              delegate: SliverChildBuilderDelegate(
+                (_, i) => ListTile(
+                  leading: const Icon(Icons.collections_bookmark),
+                  title: Text('Nested item $i'),
+                ),
+                childCount: 30,
+              ),
+            ),
+          ],
         ),
       ],
     );
