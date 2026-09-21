@@ -1,3 +1,13 @@
+# Unreleased
+
+* Added [SliverSwipeable], a sliver with a [PageView]-like swipe, and made
+  [SliverTabBarView] use it: dragging sideways slides the current tab's slivers
+  following the finger while revealing the neighboring tab underneath, then
+  settles onto the next/previous tab (or back, when the swipe is too short).
+  The [TabBar] indicator moves with the drag and settles in sync with the
+  content, exactly like a [TabBarView]. Vertical drags keep scrolling the
+  parent viewport. Disable with `enableSwipe: false`.
+
 # 0.3.0
 
 * Breaking: [SliverTabBarView] now depends on `package:material_ui`.
