@@ -64,7 +64,7 @@ import 'sliver_swipeable.dart';
 ///   ),
 /// )
 /// ```
-class SliverTabBarView extends StatelessWidget {
+class SliverTabBarView extends StatefulWidget {
   const SliverTabBarView({
     super.key,
     required this.children,
@@ -178,45 +178,7 @@ class SliverTabBarView extends StatelessWidget {
   final SliverOverlapReporterHandle? overlapHandle;
 
   @override
-  Widget build(BuildContext context) {
-    final controller = this.controller ?? DefaultTabController.of(context);
-    // Compute the wrapped tabs once per build so the instances are stable
-    // across the AnimatedBuilder's per-tick rebuilds.
-    final tabs = fillsRemaining ? _tabsFillingRemaining() : children;
-    return AnimatedBuilder(
-      animation: controller,
-      builder: (context, _) {
-        final index = controller.index;
-        final sliver = tabs[index];
-        if (!enableSwipe || !_scrollsVertically(context)) {
-          return sliver;
-        }
-        final hasPrevious = index > 0;
-        final hasNext = index < controller.length - 1;
-        return SliverSwipeable(
-          onSwipeLeft: hasNext
-              ? () =>
-                  controller.animateTo(controller.index + 1, duration: Duration.zero)
-              : null,
-          onSwipeRight: hasPrevious
-              ? () =>
-                  controller.animateTo(controller.index - 1, duration: Duration.zero)
-              : null,
-          // Mirror the slide into the TabController's offset so the TabBar
-          // indicator follows the drag. Sign: a swipe to the left (fraction
-          // negative) goes to the next tab, which is a positive offset for the
-          // TabController's animation.
-          onSwipeProgress: (fraction) => _syncTabControllerOffset(
-            controller,
-            fraction,
-          ),
-          previousChild: hasPrevious ? tabs[index - 1] : null,
-          nextChild: hasNext ? tabs[index + 1] : null,
-          child: sliver,
-        );
-      },
-    );
-  }
+  State<SliverTabBarView> createState() => _SliverTabBarViewState();
 
   List<Widget> _tabsFillingRemaining() {
     // `reveal` is how far the content rests from the top edge when the tab has
@@ -330,5 +292,66 @@ class SliverTabBarView extends StatelessWidget {
       case AxisDirection.right:
         return false;
     }
+  }
+}
+
+class _SliverTabBarViewState extends State<SliverTabBarView> {
+  // The wrapped tabs are stable and expensive to build (one SliverLayoutBuilder
+  // per tab whose reveal does a small render-tree walk at layout time), so they
+  // are built once and reused across rebuilds: the parent scrolls without
+  // rebuilding the tab structure, and the AnimatedBuilder's per-tick rebuilds
+  // only select the active sliver.
+  List<Widget>? _tabs;
+
+  @override
+  void didUpdateWidget(SliverTabBarView oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.fillsRemaining != oldWidget.fillsRemaining ||
+        !identical(widget.children, oldWidget.children) ||
+        widget.extraScroll != oldWidget.extraScroll ||
+        widget.overlapHandle != oldWidget.overlapHandle) {
+      _tabs = null;
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final controller = widget.controller ?? DefaultTabController.of(context);
+    final tabs = _tabs ??= widget.fillsRemaining
+        ? widget._tabsFillingRemaining()
+        : widget.children;
+    return AnimatedBuilder(
+      animation: controller,
+      builder: (context, _) {
+        final index = controller.index;
+        final sliver = tabs[index];
+        if (!widget.enableSwipe || !widget._scrollsVertically(context)) {
+          return sliver;
+        }
+        final hasPrevious = index > 0;
+        final hasNext = index < controller.length - 1;
+        return SliverSwipeable(
+          onSwipeLeft: hasNext
+              ? () =>
+                  controller.animateTo(controller.index + 1, duration: Duration.zero)
+              : null,
+          onSwipeRight: hasPrevious
+              ? () =>
+                  controller.animateTo(controller.index - 1, duration: Duration.zero)
+              : null,
+          // Mirror the slide into the TabController's offset so the TabBar
+          // indicator follows the drag. Sign: a swipe to the left (fraction
+          // negative) goes to the next tab, which is a positive offset for the
+          // TabController's animation.
+          onSwipeProgress: (fraction) => SliverTabBarView._syncTabControllerOffset(
+            controller,
+            fraction,
+          ),
+          previousChild: hasPrevious ? tabs[index - 1] : null,
+          nextChild: hasNext ? tabs[index + 1] : null,
+          child: sliver,
+        );
+      },
+    );
   }
 }

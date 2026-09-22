@@ -37,6 +37,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   late TabController _tabController;
   late ScrollController _scrollController;
   final ValueNotifier<double> _scrollOffset = ValueNotifier(0);
+  final SliverOverlapReporterHandle _overlap = SliverOverlapReporterHandle();
   static const double _speedFactor = 10.0;
 
   @override
@@ -65,6 +66,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     _scrollController.removeListener(_onScroll);
     _scrollController.dispose();
     _scrollOffset.dispose();
+    _overlap.dispose();
     super.dispose();
   }
 
@@ -79,7 +81,6 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         child: ValueListenableBuilder<double>(
           valueListenable: _scrollOffset,
           builder: (context, value, _) {
-            final _overlap = SliverOverlapReporterHandle();
             return CustomScrollView(
               controller: _scrollController,
               physics: const BouncingScrollPhysics(
