@@ -79,6 +79,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         child: ValueListenableBuilder<double>(
           valueListenable: _scrollOffset,
           builder: (context, value, _) {
+            final _overlap = SliverOverlapReporterHandle();
             return CustomScrollView(
               controller: _scrollController,
               physics: const BouncingScrollPhysics(
@@ -117,33 +118,36 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
 
                         // Espacio que ocupará la información superpuesta
                         const SliverToBoxAdapter(
-                          child: SizedBox(height: 210),
+                          child: SizedBox(height: 160),
                         ),
 
                         // ── TABBAR PERSISTENTE ─────────────────────────────
-                        SliverAppBar(
-                          pinned: true,
-                          primary: false,
-                          bottom: TabBar(
-                            controller: _tabController,
-                            indicatorColor: Colors.pinkAccent,
-                            indicatorSize: TabBarIndicatorSize.label,
-                            labelColor: Colors.pinkAccent,
-                            unselectedLabelColor: Colors.grey,
-                            tabs: const [
-                              Tab(
-                                icon: Icon(Icons.grid_view_rounded),
-                                text: 'Posts',
-                              ),
-                              Tab(
-                                icon: Icon(Icons.menu_book_rounded),
-                                text: 'Obras',
-                              ),
-                              Tab(
-                                icon: Icon(Icons.music_note_rounded),
-                                text: 'Música',
-                              ),
-                            ],
+                        SliverOverlapReporter(
+                          handle: _overlap,
+                          sliver: SliverAppBar(
+                            pinned: true,
+                            primary: false,
+                            bottom: TabBar(
+                              controller: _tabController,
+                              indicatorColor: Colors.pinkAccent,
+                              indicatorSize: TabBarIndicatorSize.label,
+                              labelColor: Colors.pinkAccent,
+                              unselectedLabelColor: Colors.grey,
+                              tabs: const [
+                                Tab(
+                                  icon: Icon(Icons.grid_view_rounded),
+                                  text: 'Posts',
+                                ),
+                                Tab(
+                                  icon: Icon(Icons.menu_book_rounded),
+                                  text: 'Obras',
+                                ),
+                                Tab(
+                                  icon: Icon(Icons.music_note_rounded),
+                                  text: 'Música',
+                                ),
+                              ],
+                            ),
                           ),
                         ),
 
@@ -153,6 +157,11 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                         // este CustomScrollView, así que comparten SU scroll.
                         SliverTabBarView(
                           controller: _tabController,
+                          overlapHandle: _overlap,
+                          fillsRemaining: true,
+                          // Pinta el espacio sobrante de las pestañas cortas
+                          // (libre por defecto). Cualquier widget sirve.
+                         
                           children: const [
                             PostsPage(),
                             WorksPage(),
@@ -256,7 +265,7 @@ class WorksPage extends StatelessWidget {
               title: Text('Obra item $i'),
               trailing: const Icon(Icons.chevron_right),
             ),
-            childCount: 40,
+            childCount: 2,
           ),
         ),
       ],

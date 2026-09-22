@@ -7,6 +7,24 @@
   The [TabBar] indicator moves with the drag and settles in sync with the
   content, exactly like a [TabBarView]. Vertical drags keep scrolling the
   parent viewport. Disable with `enableSwipe: false`.
+* Added [SliverTabBarView.fillsRemaining] (default false): when true, every
+  tab is extended to cover the viewport height even when its slivers are
+  shorter than the screen, keeping the content anchored at the top and adding
+  scroll extent, so short tabs can reach pinned headers (like a pinned
+  [TabBar]) and keep the swipe working in the leftover area. The leftover area
+  is painted with [SliverTabBarView.fillChild] (transparent when null). When a
+  short tab has scrolled all the way, its first items come to rest right below
+  the pinned headers laid out before it (like a pinned [SliverAppBar] holding a
+  [TabBar]), so the content is never hidden behind them nor scrolled entirely
+  out of view. The resting position is measured from the pinned headers at
+  layout time, even when they are grouped inside a [MultiSliver] or
+  [SliverStack], or reported through the new [SliverOverlapReporter] /
+  [SliverOverlapReporterHandle] pair (an [SliverOverlapAbsorber]-style handle
+  fed by a wrapper around the pinned header, like a [NestedScrollView]'s
+  overlap): pass `overlapHandle` to [SliverTabBarView.overlapHandle] for the
+  authoritatively measured height. It can be fine-tuned with
+  [SliverTabBarView.extraScroll]: a manual value can tuck the items further
+  under the header or keep them lower.
 
 # 0.3.0
 
