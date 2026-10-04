@@ -36,6 +36,9 @@ class SliverStackParentData extends ParentData
     left = value.left;
   }
 
+  /// Whether an explicit all-zero fill centers the naturally sized child.
+  bool centerWhenZero = false;
+
   Offset paintOffset = Offset.zero;
 
   double mainAxisPosition = 0;
@@ -250,10 +253,14 @@ class RenderSliverStack extends RenderSliver
       assert(parentData.isPositioned,
           'All non sliver children of SliverStack should be positioned');
       if (!parentData.isPositioned) return;
-      final childWidth = parentData.left != null && parentData.right != null
+      final childWidth = !parentData.centerWhenZero &&
+              parentData.left != null &&
+              parentData.right != null
           ? max(0.0, size.width - parentData.left! - parentData.right!)
           : parentData.width;
-      final childHeight = parentData.top != null && parentData.bottom != null
+      final childHeight = !parentData.centerWhenZero &&
+              parentData.top != null &&
+              parentData.bottom != null
           ? max(0.0, size.height - parentData.top! - parentData.bottom!)
           : parentData.height;
       // Keep natural-height content unconstrained along the scrolling axis,
@@ -277,18 +284,23 @@ class RenderSliverStack extends RenderSliver
         ),
         parentUsesSize: true,
       );
-      final alignment =
-          _alignment ??= positionedAlignment.resolve(textDirection);
+      final alignment = parentData.centerWhenZero
+          ? Alignment.center
+          : (_alignment ??= positionedAlignment.resolve(textDirection));
       final alignedOffset = alignment.alongOffset(Offset(
           size.width - child.size.width, size.height - child.size.height));
-      final x = parentData.left ??
-          (parentData.right != null
-              ? size.width - parentData.right! - child.size.width
-              : alignedOffset.dx);
-      final y = parentData.top ??
-          (parentData.bottom != null
-              ? size.height - parentData.bottom! - child.size.height
-              : alignedOffset.dy);
+      final x = parentData.centerWhenZero
+          ? alignedOffset.dx
+          : parentData.left ??
+              (parentData.right != null
+                  ? size.width - parentData.right! - child.size.width
+                  : alignedOffset.dx);
+      final y = parentData.centerWhenZero
+          ? alignedOffset.dy
+          : parentData.top ??
+              (parentData.bottom != null
+                  ? size.height - parentData.bottom! - child.size.height
+                  : alignedOffset.dy);
       parentData.paintOffset = Offset(x, y);
       final overflows = x < 0 ||
           y < 0 ||

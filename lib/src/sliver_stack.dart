@@ -88,6 +88,7 @@ class SliverPositioned extends ParentDataWidget<SliverStackParentData> {
     required Widget child,
   })  : assert(left == null || right == null || width == null),
         assert(top == null || bottom == null || height == null),
+        _centerWhenZero = false,
         super(key: key, child: child);
 
   /// Creates a Positioned object with the values from the given [Rect].
@@ -105,6 +106,7 @@ class SliverPositioned extends ParentDataWidget<SliverStackParentData> {
         height = rect.height,
         right = null,
         bottom = null,
+        _centerWhenZero = false,
         super(key: key, child: child);
 
   /// Creates a Positioned object with the values from the given [RelativeRect].
@@ -121,6 +123,7 @@ class SliverPositioned extends ParentDataWidget<SliverStackParentData> {
         bottom = rect.bottom,
         width = null,
         height = null,
+        _centerWhenZero = false,
         super(key: key, child: child);
 
   /// Positions a child using only the supplied edge insets.
@@ -130,6 +133,8 @@ class SliverPositioned extends ParentDataWidget<SliverStackParentData> {
   /// child at those edges without requiring an [Align]. Supplying both edges
   /// on an axis stretches the child on that axis. With no insets, the child
   /// fills the entire stack, preserving the default fill behavior.
+  /// Explicitly supplying zero for all four insets instead centers the child
+  /// at its natural size, independently of [SliverStack.positionedAlignment].
   ///
   /// Natural-size children are bounded by the available cross-axis extent,
   /// so flexible rows and nested viewports have a finite available width in
@@ -152,6 +157,7 @@ class SliverPositioned extends ParentDataWidget<SliverStackParentData> {
             (left == null && top == null && right == null ? 0.0 : null),
         width = null,
         height = null,
+        _centerWhenZero = left == 0 && top == 0 && right == 0 && bottom == 0,
         super(key: key, child: child);
 
   /// Creates a widget that controls where a child of a [Stack] is positioned.
@@ -261,11 +267,18 @@ class SliverPositioned extends ParentDataWidget<SliverStackParentData> {
   /// vertically.
   final double? height;
 
+  final bool _centerWhenZero;
+
   @override
   void applyParentData(RenderObject renderObject) {
     assert(renderObject.parentData is SliverStackParentData);
     final parentData = renderObject.parentData as SliverStackParentData;
     bool needsLayout = false;
+
+    if (parentData.centerWhenZero != _centerWhenZero) {
+      parentData.centerWhenZero = _centerWhenZero;
+      needsLayout = true;
+    }
 
     if (parentData.left != left) {
       parentData.left = left;
