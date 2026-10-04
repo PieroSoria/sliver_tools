@@ -18,12 +18,12 @@ void main() {
       controller: scroll,
       slivers: [
         SliverStack(children: [
-          MultiSliver(children: [
-            const SliverAppBar(
+          MultiSliver(children: const [
+            SliverAppBar(
                 expandedHeight: 200,
                 flexibleSpace: FlexibleSpaceBar(title: Text('Banner'))),
-            const SliverToBoxAdapter(child: SizedBox(height: 240)),
-            const SliverAppBar(pinned: true, title: Text('Tabs')),
+            SliverToBoxAdapter(child: SizedBox(height: 240)),
+            SliverAppBar(pinned: true, title: Text('Tabs')),
           ]),
           ValueListenableBuilder<double>(
               valueListenable: offset,
