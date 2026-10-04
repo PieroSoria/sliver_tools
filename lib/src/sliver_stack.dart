@@ -123,16 +123,31 @@ class SliverPositioned extends ParentDataWidget<SliverStackParentData> {
         height = null,
         super(key: key, child: child);
 
-  /// Creates a Positioned object with [left], [top], [right], and [bottom] set
-  /// to 0.0 unless a value for them is passed.
+  /// Positions a child using only the supplied edge insets.
+  ///
+  /// Omitted edges stay unconstrained when any inset is supplied, preserving
+  /// the child's natural size. For example, `top: 20, right: 20` anchors the
+  /// child at those edges without requiring an [Align]. Supplying both edges
+  /// on an axis stretches the child on that axis. With no insets, the child
+  /// fills the entire stack, preserving the default fill behavior.
+  ///
+  /// Insets are relative to the stack and scroll with its sliver content.
   const SliverPositioned.fill({
     Key? key,
-    this.left = 0.0,
-    this.top = 0.0,
-    this.right = 0.0,
-    this.bottom = 0.0,
+    double? left,
+    double? top,
+    double? right,
+    double? bottom,
     required Widget child,
-  })  : width = null,
+  })  : left = left ??
+            (top == null && right == null && bottom == null ? 0.0 : null),
+        top = top ??
+            (left == null && right == null && bottom == null ? 0.0 : null),
+        right = right ??
+            (left == null && top == null && bottom == null ? 0.0 : null),
+        bottom = bottom ??
+            (left == null && top == null && right == null ? 0.0 : null),
+        width = null,
         height = null,
         super(key: key, child: child);
 

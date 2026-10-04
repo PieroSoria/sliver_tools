@@ -8,7 +8,7 @@ void main() => runApp(const SliverToolsExampleApp());
 
 /// Example app demonstrating [SliverTabBarView] inside an [CustomScrollView]
 /// with a [SliverStack]: a banner, a pinned [TabBar] and the active tab's
-/// slivers all scroll together, while overlays stay fixed using
+/// slivers all scroll together, while overlays are positioned over the header using
 /// [SliverPositioned].
 class SliverToolsExampleApp extends StatelessWidget {
   const SliverToolsExampleApp({super.key});
@@ -38,7 +38,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   late ScrollController _scrollController;
   final ValueNotifier<double> _scrollOffset = ValueNotifier(0);
   final SliverOverlapReporterHandle _overlap = SliverOverlapReporterHandle();
-  static const double _speedFactor = 10.0;
+  static const double _speedFactor = 3.0;
 
   @override
   void initState() {
@@ -81,131 +81,128 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         child: ValueListenableBuilder<double>(
           valueListenable: _scrollOffset,
           builder: (context, value, _) {
-            return CustomScrollView(
-              controller: _scrollController,
-              physics: const BouncingScrollPhysics(
-                parent: AlwaysScrollableScrollPhysics(),
-              ),
-              slivers: [
-                SliverStack(
-                  children: [
-                    // ── CONTENIDO PRINCIPAL ────────────────────────────────
-                    MultiSliver(
-                      children: [
-                        // Banner con stretch (equivalente a tu BannerWidget)
-                        SliverAppBar(
-                          stretch: true,
-                          expandedHeight: 200,
-                          flexibleSpace: const FlexibleSpaceBar(
-                            collapseMode: CollapseMode.pin,
-                            stretchModes: [
-                              StretchMode.zoomBackground,
-                              StretchMode.blurBackground,
-                            ],
-                            background: DecoratedBox(
-                              decoration: BoxDecoration(
-                                gradient: LinearGradient(
-                                  begin: Alignment.topLeft,
-                                  end: Alignment.bottomRight,
-                                  colors: [
-                                    Color(0xFF3949AB),
-                                    Color(0xFF8E24AA),
-                                  ],
+            return RefreshIndicator(
+              onRefresh: () async {
+                await Future<void>.delayed(const Duration(seconds: 1));
+              },
+              child: CustomScrollView(
+                controller: _scrollController,
+                physics: const BouncingScrollPhysics(
+                  parent: AlwaysScrollableScrollPhysics(),
+                ),
+                slivers: [
+                  SliverStack(
+                    children: [
+                      // ── CONTENIDO PRINCIPAL ────────────────────────────────
+                      MultiSliver(
+                        children: [
+                          // Banner con stretch (equivalente a tu BannerWidget)
+                          SliverAppBar(
+                            stretch: true,
+                            expandedHeight: 200,
+                            flexibleSpace: const FlexibleSpaceBar(
+                              collapseMode: CollapseMode.pin,
+                              stretchModes: [
+                                StretchMode.zoomBackground,
+                                StretchMode.blurBackground,
+                              ],
+                              background: DecoratedBox(
+                                decoration: BoxDecoration(
+                                  gradient: LinearGradient(
+                                    begin: Alignment.topLeft,
+                                    end: Alignment.bottomRight,
+                                    colors: [
+                                      Color(0xFF3949AB),
+                                      Color(0xFF8E24AA),
+                                    ],
+                                  ),
                                 ),
                               ),
                             ),
                           ),
-                        ),
 
-                        // Espacio que ocupará la información superpuesta
-                        const SliverToBoxAdapter(
-                          child: SizedBox(height: 160),
-                        ),
+                          // Espacio que ocupará la información superpuesta
+                          const SliverToBoxAdapter(
+                            child: SizedBox(height: 230),
+                          ),
 
-                        // ── TABBAR PERSISTENTE ─────────────────────────────
-                        SliverOverlapReporter(
-                          handle: _overlap,
-                          sliver: SliverAppBar(
-                            pinned: true,
-                            primary: false,
-                            bottom: TabBar(
-                              controller: _tabController,
-                              indicatorColor: Colors.pinkAccent,
-                              indicatorSize: TabBarIndicatorSize.label,
-                              labelColor: Colors.pinkAccent,
-                              unselectedLabelColor: Colors.grey,
-                              tabs: const [
-                                Tab(
-                                  icon: Icon(Icons.grid_view_rounded),
-                                  text: 'Posts',
-                                ),
-                                Tab(
-                                  icon: Icon(Icons.menu_book_rounded),
-                                  text: 'Obras',
-                                ),
-                                Tab(
-                                  icon: Icon(Icons.music_note_rounded),
-                                  text: 'Música',
-                                ),
-                              ],
+                          // ── TABBAR PERSISTENTE ─────────────────────────────
+                          SliverOverlapReporter(
+                            handle: _overlap,
+                            sliver: SliverAppBar(
+                              pinned: true,
+                              primary: false,
+                              centerTitle: true,
+                              title: AnimatedSwitcher(
+                                duration: const Duration(milliseconds: 250),
+                                child: value > 350
+                                    ? const Text('Sliver Tools',
+                                        key: ValueKey('profile-title'))
+                                    : const SizedBox.shrink(),
+                              ),
+                              bottom: TabBar(
+                                controller: _tabController,
+                                indicatorColor: Colors.pinkAccent,
+                                indicatorSize: TabBarIndicatorSize.label,
+                                labelColor: Colors.pinkAccent,
+                                unselectedLabelColor: Colors.grey,
+                                tabs: const [
+                                  Tab(
+                                    icon: Icon(Icons.grid_view_rounded),
+                                    text: 'Posts',
+                                  ),
+                                  Tab(
+                                    icon: Icon(Icons.menu_book_rounded),
+                                    text: 'Obras',
+                                  ),
+                                  Tab(
+                                    icon: Icon(Icons.music_note_rounded),
+                                    text: 'Música',
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
-                        ),
+                        ],
+                      ),
 
-                        // ── VISTAS DEL TABBAR ──────────────────────────────
-                        // Reemplaza el clásico SliverFillRemaining + TabBarView:
-                        // solo los slivers de la pestaña activa se insertan en
-                        // este CustomScrollView, así que comparten SU scroll.
-                        SliverTabBarView(
-                          controller: _tabController,
-                          overlapHandle: _overlap,
-                          fillsRemaining: true,
-                          // Pinta el espacio sobrante de las pestañas cortas
-                          // (libre por defecto). Cualquier widget sirve.
-                         
-                          children: const [
-                            PostsPage(),
-                            WorksPage(),
-                            MusicPage(),
-                          ],
-                        ),
-                      ],
-                    ),
+                      // ── INFO SUPUESTA (avatar, usuario, logros) ────────────
+                      SliverPositioned.fill(
+                        top: _positionInfo(value),
+                        left: 0,
+                        right: 0,
+                        child: const _ProfileInfoOverlay(),
+                      ),
 
-                    // ── INFO SUPUESTA (avatar, usuario, logros) ────────────
-                    SliverPositioned.fill(
-                      top: _positionInfo(value),
-                      child: const _ProfileInfoOverlay(),
-                    ),
-
-                    // ── BOTÓN DE AJUSTES ───────────────────────────────────
-                    SliverPositioned.fill(
-                      left: size.width - 55,
-                      bottom: (size.height / 1.25) -
-                          (defaultTargetPlatform == TargetPlatform.iOS
-                              ? 25
-                              : 0),
-                      child: GestureDetector(
-                        onTap: () {},
-                        child: Container(
-                          width: 34,
-                          height: 34,
-                          clipBehavior: Clip.antiAliasWithSaveLayer,
-                          decoration: const BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: Color(0x1AFFFFFF),
+                      // ── BOTÓN DE AJUSTES ───────────────────────────────────
+                      SliverPositioned.fill(
+                        top: MediaQuery.paddingOf(context).top + 20,
+                        right: 20,
+                        child: IconButton.filledTonal(
+                          key: const ValueKey('profile-settings'),
+                          tooltip: 'Configuración',
+                          onPressed: () => showModalBottomSheet<void>(
+                            context: context,
+                            builder: (_) => const SafeArea(
+                              child: Padding(
+                                padding: EdgeInsets.all(24),
+                                child: Text('Configuración del perfil'),
+                              ),
+                            ),
                           ),
-                          child: const Icon(
-                            Icons.settings_outlined,
-                            color: Colors.white,
-                            size: 25,
-                          ),
+                          icon: const Icon(Icons.settings_outlined),
                         ),
                       ),
-                    ),
-                  ],
-                ),
-              ],
+                    ],
+                  ),
+                  SliverTabBarView(
+                    controller: _tabController,
+                    overlapHandle: _overlap,
+                    fillsRemaining: true,
+                    children: const [PostsPage(), WorksPage(), MusicPage()],
+                  ),
+                ],
+              ),
             );
           },
         ),
@@ -327,7 +324,7 @@ class _ProfileInfoOverlay extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text('Sliver Tools', style: texts.titleMedium),
-                    Text('sliver_tools example', style: texts.bodySmall),
+                    Text('@sliver_tools', style: texts.bodySmall),
                   ],
                 ),
               ),

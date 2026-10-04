@@ -155,6 +155,32 @@ void sliverStackTests() {
       expectAllExtents(stackSliver, 600);
     });
 
+    testWidgets('SliverPositioned.fill applies edge insets', (tester) async {
+      final cases = <({SliverPositioned Function(Widget) build, Rect rect})>[
+        (
+          build: (child) => SliverPositioned.fill(top: 20, child: child),
+          rect: const Rect.fromLTWH(399.5, 20, 1, 1),
+        ),
+        (
+          build: (child) => SliverPositioned.fill(right: 20, child: child),
+          rect: const Rect.fromLTWH(779, 299.5, 1, 1),
+        ),
+        (
+          build: (child) => SliverPositioned.fill(bottom: 20, child: child),
+          rect: const Rect.fromLTWH(399.5, 579, 1, 1),
+        ),
+        (
+          build: (child) => SliverPositioned.fill(left: 20, child: child),
+          rect: const Rect.fromLTWH(20, 299.5, 1, 1),
+        ),
+      ];
+
+      for (final testCase in cases) {
+        await setupStack(tester, topPositionedBuilder: testCase.build);
+        expect(tester.getRect(find.byKey(topPositionedKey)), testCase.rect);
+      }
+    });
+
     testWidgets('positions all child slivers correctly when horizontal',
         (tester) async {
       await setupStack(tester, scrollDirection: Axis.horizontal);
