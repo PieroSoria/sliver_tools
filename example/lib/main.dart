@@ -175,22 +175,27 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                       ),
 
                       // ── BOTÓN DE AJUSTES ───────────────────────────────────
-                      SliverPositioned.fill(
-                        top: MediaQuery.paddingOf(context).top + 20,
-                        right: 20,
-                        child: IconButton.filledTonal(
-                          key: const ValueKey('profile-settings'),
-                          tooltip: 'Configuración',
-                          onPressed: () => showModalBottomSheet<void>(
-                            context: context,
-                            builder: (_) => const SafeArea(
-                              child: Padding(
-                                padding: EdgeInsets.all(24),
-                                child: Text('Configuración del perfil'),
+                      SliverAlign(
+                        alignment: Alignment.topRight,
+                        child: Padding(
+                          padding: EdgeInsets.only(
+                            top: MediaQuery.paddingOf(context).top + 20,
+                            right: 20,
+                          ),
+                          child: IconButton.filledTonal(
+                            key: const ValueKey('profile-settings'),
+                            tooltip: 'Configuración',
+                            onPressed: () => showModalBottomSheet<void>(
+                              context: context,
+                              builder: (_) => const SafeArea(
+                                child: Padding(
+                                  padding: EdgeInsets.all(24),
+                                  child: Text('Configuración del perfil'),
+                                ),
                               ),
                             ),
+                            icon: const Icon(Icons.settings_outlined),
                           ),
-                          icon: const Icon(Icons.settings_outlined),
                         ),
                       ),
                     ],

@@ -39,6 +39,9 @@ class SliverStackParentData extends ParentData
   /// Whether an explicit all-zero fill centers the naturally sized child.
   bool centerWhenZero = false;
 
+  /// Per-child alignment supplied by SliverAlign.
+  AlignmentGeometry? alignment;
+
   Offset paintOffset = Offset.zero;
 
   double mainAxisPosition = 0;
@@ -51,6 +54,7 @@ class SliverStackParentData extends ParentData
   /// of the stack but are instead placed relative to the non-positioned
   /// children in the stack.
   bool get isPositioned =>
+      alignment != null ||
       top != null ||
       right != null ||
       bottom != null ||
@@ -284,9 +288,10 @@ class RenderSliverStack extends RenderSliver
         ),
         parentUsesSize: true,
       );
-      final alignment = parentData.centerWhenZero
-          ? Alignment.center
-          : (_alignment ??= positionedAlignment.resolve(textDirection));
+      final alignment = parentData.alignment?.resolve(textDirection) ??
+          (parentData.centerWhenZero
+              ? Alignment.center
+              : (_alignment ??= positionedAlignment.resolve(textDirection)));
       final alignedOffset = alignment.alongOffset(Offset(
           size.width - child.size.width, size.height - child.size.height));
       final x = parentData.centerWhenZero

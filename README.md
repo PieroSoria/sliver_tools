@@ -68,6 +68,28 @@ class WidgetThatReturnsASliver extends StatelessWidget {
 
 The `pushPinnedChildren` parameter allows for achieving a 'sticky header' effect by simply using pinned `SliverPersistentHeader` widgets (or any custom sliver that paints beyond its layoutExtent).
 
+## SliverAlign
+
+Align a box widget inside a `SliverStack` without stretching it. The alignment
+is relative to the stack, and the child scrolls with its content.
+
+```dart
+SliverStack(
+  children: [
+    const SliverToBoxAdapter(child: SizedBox(height: 240)),
+    SliverAlign(
+      alignment: Alignment.topRight,
+      child: Padding(
+        padding: const EdgeInsets.all(20),
+        child: SizedBox(width: 40, height: 40, child: Icon(Icons.settings)),
+      ),
+    ),
+  ],
+)
+```
+
+The default is `Alignment.center`. `AlignmentDirectional` is also supported.
+
 ## [SliverStack](https://github.com/Kavantix/sliver_tools/blob/master/lib/src/sliver_stack.dart)
 
 The [SliverStack] widget allows for stacking of both slivers and box widgets.

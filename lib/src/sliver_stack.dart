@@ -278,6 +278,11 @@ class SliverPositioned extends ParentDataWidget<SliverStackParentData> {
     final parentData = renderObject.parentData as SliverStackParentData;
     bool needsLayout = false;
 
+    if (parentData.alignment != null) {
+      parentData.alignment = null;
+      needsLayout = true;
+    }
+
     if (parentData.centerWhenZero != _centerWhenZero) {
       parentData.centerWhenZero = _centerWhenZero;
       needsLayout = true;
