@@ -76,7 +76,11 @@ void sliverStackTests() {
                 insetOnOverlap: !ignoreOverlap,
                 children: <Widget>[
                   if (topPositionedBuilder == null)
-                    SliverPositioned.fill(
+                    SliverPositioned(
+                      top: 0,
+                      left: 0,
+                      right: 0,
+                      bottom: 0,
                       child: box(positionedKey),
                     ),
                   SliverToBoxAdapter(

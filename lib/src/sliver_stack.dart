@@ -131,10 +131,10 @@ class SliverPositioned extends ParentDataWidget<SliverStackParentData> {
   /// Omitted edges stay unconstrained when any inset is supplied, preserving
   /// the child's natural size. For example, `top: 20, right: 20` anchors the
   /// child at those edges without requiring an [Align]. Supplying both edges
-  /// on an axis stretches the child on that axis. With no insets, the child
-  /// fills the entire stack, preserving the default fill behavior.
-  /// Explicitly supplying zero for all four insets instead centers the child
-  /// at its natural size, independently of [SliverStack.positionedAlignment].
+  /// on an axis stretches the child on that axis. When all insets are zero
+  /// or omitted, the child is centered at its natural size, independently of
+  /// [SliverStack.positionedAlignment]. For a stretched background use
+  /// [SliverPositioned] with all four edges set to zero.
   ///
   /// Natural-size children are bounded by the available cross-axis extent,
   /// so flexible rows and nested viewports have a finite available width in
@@ -157,7 +157,10 @@ class SliverPositioned extends ParentDataWidget<SliverStackParentData> {
             (left == null && top == null && right == null ? 0.0 : null),
         width = null,
         height = null,
-        _centerWhenZero = left == 0 && top == 0 && right == 0 && bottom == 0,
+        _centerWhenZero = (left == null || left == 0) &&
+            (top == null || top == 0) &&
+            (right == null || right == 0) &&
+            (bottom == null || bottom == 0),
         super(key: key, child: child);
 
   /// Creates a widget that controls where a child of a [Stack] is positioned.
