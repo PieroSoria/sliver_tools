@@ -131,6 +131,9 @@ class SliverPositioned extends ParentDataWidget<SliverStackParentData> {
   /// on an axis stretches the child on that axis. With no insets, the child
   /// fills the entire stack, preserving the default fill behavior.
   ///
+  /// Natural-size children are bounded by the available cross-axis extent,
+  /// so flexible rows and nested viewports have a finite available width in
+  /// a vertical scroll view. Their height is still determined by the content.
   /// Insets are relative to the stack and scroll with its sliver content.
   const SliverPositioned.fill({
     Key? key,

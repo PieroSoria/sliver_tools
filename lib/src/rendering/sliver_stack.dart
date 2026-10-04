@@ -3,17 +3,6 @@ import 'dart:math';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/rendering.dart';
 
-class _SimpleSliverStackParentData extends StackParentData {
-  final void Function(Offset value) onOffsetUpdated;
-
-  _SimpleSliverStackParentData(this.onOffsetUpdated);
-  @override
-  set offset(Offset newOffset) {
-    super.offset = newOffset;
-    onOffsetUpdated(newOffset);
-  }
-}
-
 class SliverStackParentData extends ParentData
     with ContainerParentDataMixin<RenderObject> {
   /// The distance by which the child's top edge is inset from the top of the stack.
@@ -80,16 +69,6 @@ class SliverStackParentData extends ParentData
     values.add(super.toString());
     return values.join('; ');
   }
-
-  _SimpleSliverStackParentData get _simpleStackParentData =>
-      _SimpleSliverStackParentData((value) => paintOffset = value)
-        ..top = top
-        ..right = right
-        ..bottom = bottom
-        ..left = left
-        ..width = width
-        ..height = height
-        ..offset = paintOffset;
 }
 
 class RenderSliverStack extends RenderSliver
@@ -271,14 +250,50 @@ class RenderSliverStack extends RenderSliver
       assert(parentData.isPositioned,
           'All non sliver children of SliverStack should be positioned');
       if (!parentData.isPositioned) return;
-      child.parentData = parentData._simpleStackParentData;
-      final overflows = RenderStack.layoutPositionedChild(
-        child,
-        child.parentData as StackParentData,
-        size,
-        _alignment ??= positionedAlignment.resolve(textDirection),
+      final childWidth = parentData.left != null && parentData.right != null
+          ? max(0.0, size.width - parentData.left! - parentData.right!)
+          : parentData.width;
+      final childHeight = parentData.top != null && parentData.bottom != null
+          ? max(0.0, size.height - parentData.top! - parentData.bottom!)
+          : parentData.height;
+      // Keep natural-height content unconstrained along the scrolling axis,
+      // but bound the cross axis so Rows and nested viewports can lay out.
+      final availableWidth = max(
+          0.0, size.width - (parentData.left ?? 0) - (parentData.right ?? 0));
+      final availableHeight = max(
+          0.0, size.height - (parentData.top ?? 0) - (parentData.bottom ?? 0));
+      child.layout(
+        BoxConstraints(
+          minWidth: childWidth ?? 0,
+          maxWidth: childWidth ??
+              (constraints.axis == Axis.vertical
+                  ? availableWidth
+                  : double.infinity),
+          minHeight: childHeight ?? 0,
+          maxHeight: childHeight ??
+              (constraints.axis == Axis.horizontal
+                  ? availableHeight
+                  : double.infinity),
+        ),
+        parentUsesSize: true,
       );
-      child.parentData = parentData;
+      final alignment =
+          _alignment ??= positionedAlignment.resolve(textDirection);
+      final alignedOffset = alignment.alongOffset(Offset(
+          size.width - child.size.width, size.height - child.size.height));
+      final x = parentData.left ??
+          (parentData.right != null
+              ? size.width - parentData.right! - child.size.width
+              : alignedOffset.dx);
+      final y = parentData.top ??
+          (parentData.bottom != null
+              ? size.height - parentData.bottom! - child.size.height
+              : alignedOffset.dy);
+      parentData.paintOffset = Offset(x, y);
+      final overflows = x < 0 ||
+          y < 0 ||
+          x + child.size.width > size.width ||
+          y + child.size.height > size.height;
       final paintOffset = constraints.scrollOffset - overlapAndScroll;
       switch (axisDirection) {
         case AxisDirection.up:
